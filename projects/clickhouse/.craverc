@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ -e /tmp/dcshim.conf ] ; then
+    # /tmp/dcshim.conf is a json file that has "projectMountPath" pointing to the full directory where the sources are cloned
+    export GITROOT=$(jq -r .projectMountPath /tmp/dcshim.conf)
+
+    if [ -d $GITROOT/build/programs ] ; then
+		# If the programs have been built, keep them at the front of the PATH
+		export PATH=$GITROOT/build/programs:$PATH
+
+        # Teehee: Start the server if it exists. Why not?
+        if [ -e $GITROOT/build/programs/clickhouse-server ] ; then
+            $GITROOT/build/programs/clickhouse-server --daemon
+        fi
+    fi
+fi
